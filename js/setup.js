@@ -1,4 +1,4 @@
-const editScreenElem = document.getElementById("screen-editor");
+const editScreenElem = document.getElementById("edit-screen");
 const editScreenCtx = editScreenElem.getContext("2d");
 
 let currentImageData;

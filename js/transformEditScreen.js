@@ -11,6 +11,7 @@ function transformEditScreen() {
     editScreenCtx.scale(scale, scale);
     editScreenCtx.translate(x, y);
 
+    //Limpa a tela
     editScreenCtx.clearRect(
         -x - editScreenElem.width  / 2 / scale,
         -y - editScreenElem.height / 2 / scale,
@@ -61,8 +62,6 @@ function draw(event) {
 
 //Adicionando eventos
 window.addEventListener("resize", resizeEditScreen, false);
+
 window.addEventListener("click", (event) => {event.preventDefault()}, false);
 window.addEventListener("contextmenu", event => event.preventDefault(), false);
-window.addEventListener("mousedown", (e) => {}, false);
-window.addEventListener("mouseup", (e) => {}, false);
-window.addEventListener("mousemove", draw, false);

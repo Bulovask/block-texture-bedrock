@@ -12,7 +12,7 @@ main {
     height: calc(100vh - 10px);
 }
 
-canvas#screen-editor {
+canvas#edit-screen {
     box-sizing: border-box;
     background-image: url("images/default-transparent-bg.png");
     background-repeat: repeat-x repeat-y;
@@ -21,4 +21,56 @@ canvas#screen-editor {
     image-rendering: pixelated;
     width: 100%;
     height: 100%;
+}
+
+menu#edit-screen-toolbar {
+    --width-edit-screen-toolbar: 6vw;
+    box-sizing: border-box;
+    margin: 0;
+    padding: 2px;
+    position: fixed;
+    display: flex;
+    gap: 4px;
+    background-color: #000d5898;
+    box-shadow: 1px 1px 4px #000;
+    border-radius: 10px;
+    overflow: hidden;
+    
+    flex-direction: column;
+    width: var(--width-edit-screen-toolbar);
+    left: 10px;
+    top: 15px;
+    height: calc(100vh - 30px);
+}
+
+@media (orientation: portrait) {
+    menu#edit-screen-toolbar {
+        flex-direction: row;
+        height: var(--width-edit-screen-toolbar);
+        top: auto;
+        bottom: 10px;
+        left: 15px;
+        width: calc(100vw - 30px);
+    }
+}
+
+menu#edit-screen-toolbar button{
+    margin: 0;
+    padding: 0;
+    border: 1px solid #000;
+    border-bottom-width: 4px;
+    border-radius: 25%;
+    box-sizing: border-box;
+    list-style: none;
+    background-color: #969696;
+    height: calc(var(--width-edit-screen-toolbar) - 4px);
+    width: calc(var(--width-edit-screen-toolbar) - 4px);
+    flex-shrink: 0;
+}
+
+menu#edit-screen-toolbar button:active {
+    background-color: #4b4b4b;
+    border-bottom-width: 1px;
+    margin-top: 3px;
+    height: calc(var(--width-edit-screen-toolbar) - 4px - 3px);
 }
