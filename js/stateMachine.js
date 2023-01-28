@@ -7,13 +7,13 @@ const states = {
         func: (event) => {
             const self = states.moveEditScreen;
             
-            if((event.type == "mousedown" && event.buttons == 1) || (event.type == "touchstart")) {
+            if((event.type == "mousedown" && event.buttons == 1) || (event.type == "touchstart" && event.targetTouches.length == 1)) {
                 self.oldX = event.clientX ?? event.targetTouches[0].clientX;
                 self.oldY = event.clientY ?? event.targetTouches[0].clientY;
                 self.mainMouseButtonPressed = true;
             }
 
-            else if((event.type == "mousemove" && self.mainMouseButtonPressed) || (event.type == "touchmove")) {
+            else if((event.type == "mousemove" && self.mainMouseButtonPressed) || (event.type == "touchmove" && event.targetTouches.length == 1)) {
                 const x = event.clientX ?? event.targetTouches[0].clientX;
                 const y = event.clientY ?? event.targetTouches[0].clientY;
 
@@ -27,7 +27,7 @@ const states = {
                 self.oldY = y;
             }
 
-            else if((event.type == "mouseup" && event.buttons == 0) || (event.type == "touchend")) {
+            else if((event.type == "mouseup" && event.buttons == 0) || (event.type == "touchend" && event.targetTouches.length == 1)) {
                 self.oldX = null;
                 self.oldY = null;
                 self.mainMouseButtonPressed = false;
@@ -75,7 +75,7 @@ window.addEventListener("mousemove", stateMachine.control, false);
 
 //Eventos do touchScreen
 window.addEventListener("touchstart", stateMachine.control, {passive: false});
-window.addEventListener("touchmove", stateMachine.control, {passive: true});
+window.addEventListener("touchmove", stateMachine.control, {passive: false});
 window.addEventListener("touchend", stateMachine.control, {passive: false});
 
 //Eventos de teclado
