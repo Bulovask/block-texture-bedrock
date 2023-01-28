@@ -33,13 +33,33 @@ const states = {
                 self.mainMouseButtonPressed = false;
             }
         }
+    },
+    scaleEditScreen: {
+        func: (event) => {
+            const self = states.scaleEditScreen;
+            if(event.type == "keydown") {
+                if(event.key == "+") {
+                    editScreenConfig.scale += 0.02;
+                    if(editScreenConfig.scale > 5) editScreenConfig.scale = 5;
+                }
+                else if(event.key == "-") {
+                    editScreenConfig.scale -= 0.02;
+                    if(editScreenConfig.scale < 0.2) editScreenConfig.scale = 0.2;
+                }
+            }
+            //Altera para o estado de mover a tela de edição
+            else if(event.type == "mousedown" || event.type == "touchstart") {
+                stateMachine.currentState = states.moveEditScreen;
+                stateMachine.control(event);
+            }
+        }
     }
 }
 
 const stateMachine = {
-    currentState: states.moveEditScreen,
-    control: (event) => {
-        event.preventDefault();
+    currentState: states.scaleEditScreen,
+    control: (event, preventDefault = true) => {
+        if(preventDefault) { event.preventDefault() }
         const state = stateMachine.currentState ?? null;
         if(state) {
             state.func(event);
@@ -55,8 +75,20 @@ window.addEventListener("mousemove", stateMachine.control, false);
 
 //Eventos do touchScreen
 window.addEventListener("touchstart", stateMachine.control, {passive: false});
-window.addEventListener("touchmove", stateMachine.control, {passive: false});
+window.addEventListener("touchmove", stateMachine.control, {passive: true});
 window.addEventListener("touchend", stateMachine.control, {passive: false});
 
+//Eventos de teclado
+window.addEventListener("keydown", (event) => { stateMachine.control(event, false) }, false);
+window.addEventListener("keyup", (event) => { stateMachine.control(event, false) }, false);
+
+
+//Parar a propagação no editScreenToolbarElem 
 const editScreenToolbarElem = document.getElementById("edit-screen-toolbar");
 editScreenToolbarElem.addEventListener("mousedown", (e) => e.stopPropagation(), false);
+editScreenToolbarElem.addEventListener("mousemove", (e) => e.stopPropagation(), false);
+editScreenToolbarElem.addEventListener("mouseup", (e) => e.stopPropagation(), false);
+
+editScreenToolbarElem.addEventListener("touchstart", (e) => e.stopPropagation(), {passive: false});
+editScreenToolbarElem.addEventListener("touchmove", (e) => e.stopPropagation(), {passive: false});
+editScreenToolbarElem.addEventListener("touchend", (e) => e.stopPropagation(), {passive: false});
