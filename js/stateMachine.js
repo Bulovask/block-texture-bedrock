@@ -6,7 +6,7 @@ const states = {
         //Verifica se o botao principal está sendo pressionado e enquanto o mouse é movido o contexto da tela de edicao o acompanha
         func: (event) => {
             const self = states.moveEditScreen;
-            
+
             if((event.type == "mousedown" && event.buttons == 1) || (event.type == "touchstart" && event.targetTouches.length == 1)) {
                 self.oldX = event.clientX ?? event.targetTouches[0].clientX;
                 self.oldY = event.clientY ?? event.targetTouches[0].clientY;
@@ -27,10 +27,15 @@ const states = {
                 self.oldY = y;
             }
 
-            else if((event.type == "mouseup" && event.buttons == 0) || (event.type == "touchend" && event.targetTouches.length == 1)) {
+            else if((event.type == "mouseup" && event.buttons == 0) || (event.type == "mouseout") || (event.type == "touchend" && event.targetTouches.length == 1) || (event.type == "touchstart" && event.targetTouches.length > 1)) {
                 self.oldX = null;
                 self.oldY = null;
                 self.mainMouseButtonPressed = false;
+            }
+            //Altera para o estado de mudar escala da tela de edição
+            else if(event.type == "keydown") {
+                stateMachine.currentState = states.scaleEditScreen;
+                stateMachine.control(event, false);
             }
         }
     },
@@ -53,11 +58,39 @@ const states = {
                 stateMachine.control(event);
             }
         }
+    },
+    drawWithPencil: {
+        on: false,
+        func: (event) => {
+            const self = states.drawWithPencil;
+
+            const draw = () => {
+                const coords = canvasClientCoordsInImageDataCoords(event);
+                const inside = ImgData.drawPixel(currentImageData, editScreenConfig.colorMain, coords.x, coords.y);
+                cache.imageBitmap.modified = true;
+                return inside;
+            }
+
+            if(event.type == "mousedown") {
+                self.on = true;
+                if(!draw()) {
+                    self.on = false;
+                    stateMachine.currentState = states.moveEditScreen;
+                    stateMachine.control(event);
+                }
+            }
+            else if(event.type == "mousemove" && self.on) {
+                draw();
+            }
+            else if(event.type == "mouseup") {
+                self.on = false;
+            }
+        }
     }
 }
 
 const stateMachine = {
-    currentState: states.scaleEditScreen,
+    currentState: null,
     control: (event, preventDefault = true) => {
         if(preventDefault) { event.preventDefault() }
         const state = stateMachine.currentState ?? null;
@@ -69,6 +102,7 @@ const stateMachine = {
 }
 
 //Eventos do mouse
+window.addEventListener("mouseout", stateMachine.control, false);
 window.addEventListener("mousedown", stateMachine.control, false);
 window.addEventListener("mouseup", stateMachine.control, false);
 window.addEventListener("mousemove", stateMachine.control, false);
@@ -88,7 +122,16 @@ const editScreenToolbarElem = document.getElementById("edit-screen-toolbar");
 editScreenToolbarElem.addEventListener("mousedown", (e) => e.stopPropagation(), false);
 editScreenToolbarElem.addEventListener("mousemove", (e) => e.stopPropagation(), false);
 editScreenToolbarElem.addEventListener("mouseup", (e) => e.stopPropagation(), false);
+editScreenToolbarElem.addEventListener("mouseout", (e) => e.stopPropagation(), false);
 
 editScreenToolbarElem.addEventListener("touchstart", (e) => e.stopPropagation(), {passive: false});
 editScreenToolbarElem.addEventListener("touchmove", (e) => e.stopPropagation(), {passive: false});
 editScreenToolbarElem.addEventListener("touchend", (e) => e.stopPropagation(), {passive: false});
+
+//Botões do elemento edit-screen-toolbar
+const moveEditScreenBtn = document.getElementById("moveEditScreenBtn");
+const pencilBtn = document.getElementById("pencilBtn");
+
+//Adicionando comportamentos nos botões
+moveEditScreenBtn.addEventListener("click", () => stateMachine.currentState = states.moveEditScreen, false);
+pencilBtn.addEventListener("click", () => stateMachine.currentState = states.drawWithPencil, false);

@@ -24,7 +24,7 @@ canvas#edit-screen {
 }
 
 menu#edit-screen-toolbar {
-    --width-edit-screen-toolbar: 6vw;
+    --width-or-height-edit-screen-toolbar: 6vw;
     box-sizing: border-box;
     margin: 0;
     padding: 2px;
@@ -37,7 +37,7 @@ menu#edit-screen-toolbar {
     overflow: hidden;
     
     flex-direction: column;
-    width: var(--width-edit-screen-toolbar);
+    width: var(--width-or-height-edit-screen-toolbar);
     left: 10px;
     top: 15px;
     height: calc(100vh - 30px);
@@ -45,8 +45,9 @@ menu#edit-screen-toolbar {
 
 @media (orientation: portrait) {
     menu#edit-screen-toolbar {
+        --width-or-height-edit-screen-toolbar: 6vh;
         flex-direction: row;
-        height: var(--width-edit-screen-toolbar);
+        height: var(--width-or-height-edit-screen-toolbar);
         top: auto;
         bottom: 10px;
         left: 15px;
@@ -63,8 +64,8 @@ menu#edit-screen-toolbar button{
     box-sizing: border-box;
     list-style: none;
     background-color: #969696;
-    height: calc(var(--width-edit-screen-toolbar) - 4px);
-    width: calc(var(--width-edit-screen-toolbar) - 4px);
+    height: calc(var(--width-or-height-edit-screen-toolbar) - 4px);
+    width: calc(var(--width-or-height-edit-screen-toolbar) - 4px);
     flex-shrink: 0;
 }
 
@@ -72,5 +73,5 @@ menu#edit-screen-toolbar button:active {
     background-color: #4b4b4b;
     border-bottom-width: 1px;
     margin-top: 3px;
-    height: calc(var(--width-edit-screen-toolbar) - 4px - 3px);
+    height: calc(var(--width-or-height-edit-screen-toolbar) - 4px - 3px);
 }

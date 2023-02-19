@@ -1,5 +1,4 @@
-createImageData(16, 16, [255, 255, 0, 255]);
-imageConfig.background = [0, 255, 0, 2];
+createImageData(16, 16, imageConfig.background)
 
 resizeEditScreen();
 transformEditScreen();

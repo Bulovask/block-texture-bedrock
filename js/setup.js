@@ -10,7 +10,9 @@ const editScreenConfig = {
     pixelSize: 15, //Tamanho do pixel "virtual" do editor em pixels "reais" do canvas
     border: true,
     borderColor: "#000",
-    borderWeight: 1
+    borderWeight: 1,
+    colorMain: [0, 0, 0, 128],
+    colorSecondary: [255, 255, 255, 255]
 }
 
 const imageConfig = {
@@ -39,9 +41,9 @@ function renderImagemInEditScreen(img) {
     //Desenha uma borda em torno da imagem
     if(editScreenConfig.border) {
         //offsets: para corrigir bordas borradas
-        const offsetX = (editScreenElem.width % 2 == 1 ? 0 : 0.5) - editScreenConfig.x % 1;
-        const offsetY = (editScreenElem.height % 2 == 1 ? 0 : 0.5) - editScreenConfig.y % 1;
-        editScreenCtx.lineWidth = editScreenConfig.borderWeight;
+        const offsetX = (editScreenElem.width % 2 == 1 ? 0 : 0.5) - (editScreenConfig.x) % 1;
+        const offsetY = (editScreenElem.height % 2 == 1 ? 0 : 0.5) - (editScreenConfig.y) % 1;
+        editScreenCtx.lineWidth = editScreenConfig.borderWeight / editScreenConfig.scale;
         editScreenCtx.strokeStyle = editScreenConfig.borderColor;
         editScreenCtx.strokeRect(x + offsetX, y + offsetY, width, height);
     }

@@ -1,0 +1,9 @@
+#edit-screen-toolbar button {
+    background-size: 90% 90%;
+    background-position: center;
+    background-repeat: no-repeat;
+    image-rendering: pixelated;
+}
+
+#moveEditScreenBtn { background-image: url("images/edit-screen-toolbar-icons/move-screen.png"); }
+#pencilBtn { background-image: url("images/edit-screen-toolbar-icons/pencil.png");}

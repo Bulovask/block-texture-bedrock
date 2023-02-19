@@ -13,7 +13,9 @@ class ImgData {
             imgData.data[i * 4 + 1] = color.g ?? color[1] ?? 0;
             imgData.data[i * 4 + 2] = color.b ?? color[2] ?? 0;
             imgData.data[i * 4 + 3] = color.a ?? color[3] ?? 255;
+            return true;
         }
+        return false;
     }
     //Retorna a cor do pixel de um imageData ou undefined caso o índice ou as coordenadas x e y estejam fora do imageData
     static getPixel(imgData, x, y) {
@@ -28,6 +30,7 @@ class ImgData {
             const k = i * 4;
             return [data[k], data[k+1], data[k+2], data[k+3]];
         }
+        return false;
     }
     //É parecido com o setPixel, mas ele mistura a cor do pixel com a cor passada como parâmetro
     static drawPixel(imgData, color, x, y) {
@@ -46,7 +49,9 @@ class ImgData {
 
             const newColor = Array.from(ctx.getImageData(0,0,1,1).data);
             ImgData.setPixel(imgData, newColor, x, y);
+            return true;
         }
+        return false;
     }
     //Cria um canvas para manipulação de pixels, pode ser usado para combinar pixels individuais ou imageDatas inteiros 
     static createPixelManipulationCanvas(width = 1, height = 1) {
