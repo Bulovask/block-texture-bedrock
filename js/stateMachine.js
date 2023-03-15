@@ -64,26 +64,50 @@ const states = {
         func: (event) => {
             const self = states.drawWithPencil;
 
-            const draw = () => {
+            const draw = (auxiliary) => {
+                const img_data = auxiliary ? auxiliaryImageData : currentImageData;
                 const coords = canvasClientCoordsInImageDataCoords(event);
-                const inside = ImgData.drawPixel(currentImageData, editScreenConfig.colorMain, coords.x, coords.y);
-                cache.imageBitmap.modified = true;
+                const inside = ImgData.setPixel(img_data, editScreenConfig.colorMain, coords.x, coords.y);
+                if(!auxiliary) cache.imageBitmap.modified = true;
                 return inside;
             }
 
-            if(event.type == "mousedown") {
-                self.on = true;
-                if(!draw()) {
+            //Desenha diretamente em currentImageData caso o canal alpha do lapis seja 255
+            if(editScreenConfig.colorMain[3] == 255) {
+                if(event.type == "mousedown") {
+                    self.on = true;
+                    if(!draw()) {
+                        self.on = false;
+                        stateMachine.currentState = states.moveEditScreen;
+                        stateMachine.control(event);
+                    }
+                }
+                else if(event.type == "mousemove" && self.on) {
+                    draw();
+                }
+                else if(event.type == "mouseup") {
                     self.on = false;
-                    stateMachine.currentState = states.moveEditScreen;
-                    stateMachine.control(event);
                 }
             }
-            else if(event.type == "mousemove" && self.on) {
-                draw();
-            }
-            else if(event.type == "mouseup") {
-                self.on = false;
+            else {// senão desenhe em auxiliaryImageData e depois mescle 
+                if(event.type == "mousedown") {
+                    self.on = true;
+                    imageConfig.auxiliaryImage = true;
+
+                    if(!draw(true)) {
+                        self.on = false;
+                        stateMachine.currentState = states.moveEditScreen;
+                        stateMachine.control(event);
+                    }
+                }
+                else if(event.type == "mousemove" && self.on) {
+                    draw(true);
+                }
+                else if(event.type == "mouseup") {
+                    self.on = false;
+                    imageConfig.auxiliaryImage = false;
+                    mergeImages();
+                }
             }
         }
     }

@@ -54,11 +54,11 @@ function canvasClientCoordsInImageDataCoords(event) {
 }
 
 //Essa função é apenas para testes, não permanecerá aqui e nem será assim
-function draw(event) {
-    const coords = canvasClientCoordsInImageDataCoords(event);
-    ImgData.drawPixel(currentImageData, imageConfig.background, coords.x, coords.y);
-    cache.imageBitmap.modified = true;
-}
+// function draw(event) {
+//     const coords = canvasClientCoordsInImageDataCoords(event);
+//     ImgData.drawPixel(currentImageData, imageConfig.background, coords.x, coords.y);
+//     cache.imageBitmap.modified = true;
+// }
 
 //Adicionando eventos
 window.addEventListener("resize", resizeEditScreen, false);
