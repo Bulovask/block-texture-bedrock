@@ -45,7 +45,10 @@ function canvasClientCoordsInImageDataCoords(event) {
     const scale = editScreenConfig.scale;
     const esc = editScreenConfig;
 
-    const coords = canvasClientCoordsToCanvasCoords(event.clientX, event.clientY);
+
+    const x = event.clientX ?? event.targetTouches[0].clientX;
+    const y = event.clientY ?? event.targetTouches[0].clientY;
+    const coords = canvasClientCoordsToCanvasCoords(x, y);
 
     return {
         x: Math.floor((-esc.x + coords.x / scale - editScreenElem.width / scale / 2 + pixelSize * width / 2) / pixelSize),

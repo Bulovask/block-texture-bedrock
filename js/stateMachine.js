@@ -74,7 +74,7 @@ const states = {
 
             //Desenha diretamente em currentImageData caso o canal alpha do lapis seja 255
             if(editScreenConfig.colorMain[3] == 255) {
-                if(event.type == "mousedown") {
+                if(event.type == "mousedown" || event.type == "touchstart") {
                     self.on = true;
                     if(!draw()) {
                         self.on = false;
@@ -82,15 +82,15 @@ const states = {
                         stateMachine.control(event);
                     }
                 }
-                else if(event.type == "mousemove" && self.on) {
+                else if((event.type == "mousemove" || event.type == "touchmove") && self.on) {
                     draw();
                 }
-                else if(event.type == "mouseup") {
+                else if(event.type == "mouseup" || event.type == "touchend") {
                     self.on = false;
                 }
             }
             else {// senão desenhe em auxiliaryImageData e depois mescle 
-                if(event.type == "mousedown") {
+                if(event.type == "mousedown" || event.type == "touchstart") {
                     self.on = true;
                     imageConfig.auxiliaryImage = true;
 
@@ -100,10 +100,10 @@ const states = {
                         stateMachine.control(event);
                     }
                 }
-                else if(event.type == "mousemove" && self.on) {
+                else if((event.type == "mousemove" || event.type == "touchmove") && self.on) {
                     draw(true);
                 }
-                else if(event.type == "mouseup") {
+                else if(event.type == "mouseup" || event.type == "touchend") {
                     self.on = false;
                     imageConfig.auxiliaryImage = false;
                     mergeImages();
