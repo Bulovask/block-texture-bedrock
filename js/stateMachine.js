@@ -13,7 +13,7 @@ const states = {
                 self.mainMouseButtonPressed = true;
             }
 
-            else if((event.type == "mousemove" && self.mainMouseButtonPressed) || (event.type == "touchmove" && event.targetTouches.length == 1)) {
+            else if((event.type == "mousemove" && self.mainMouseButtonPressed) || (event.type == "touchmove" && event.targetTouches.length == 1 && self.mainMouseButtonPressed)) {
                 const x = event.clientX ?? event.targetTouches[0].clientX;
                 const y = event.clientY ?? event.targetTouches[0].clientY;
 
