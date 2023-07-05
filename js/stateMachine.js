@@ -3,14 +3,26 @@ const states = {
         oldX: null,
         oldY: null,
         mainMouseButtonPressed: false,
+        returnToPreviousState: false,
         //Verifica se o botao principal está sendo pressionado e enquanto o mouse é movido o contexto da tela de edicao o acompanha
         func: (event) => {
             const self = states.moveEditScreen;
 
             if((event.type == "mousedown" && event.buttons == 1) || (event.type == "touchstart" && event.targetTouches.length == 1)) {
-                self.oldX = event.clientX ?? event.targetTouches[0].clientX;
-                self.oldY = event.clientY ?? event.targetTouches[0].clientY;
-                self.mainMouseButtonPressed = true;
+                const {x, y} = canvasClientCoordsInImageDataCoords(event);
+                
+                if(self.returnToPreviousState && x >= 0 && y >= 0 && x <= currentImageData.width && y <= currentImageData.height) {
+                    stateMachine.currentState = self.returnToPreviousState;
+                    self.returnToPreviousState = false;
+                    stateMachine.control(event);
+                    return
+                }
+                else {
+                    self.oldX = event.clientX ?? event.targetTouches[0].clientX;
+                    self.oldY = event.clientY ?? event.targetTouches[0].clientY;
+                    self.mainMouseButtonPressed = true;
+                }
+                
             }
 
             else if((event.type == "mousemove" && self.mainMouseButtonPressed) || (event.type == "touchmove" && event.targetTouches.length == 1 && self.mainMouseButtonPressed)) {
@@ -35,11 +47,13 @@ const states = {
             //Altera para o estado de mudar escala da tela de edição
             else if(event.type == "keydown") {
                 stateMachine.currentState = states.scaleEditScreen;
+                states.scaleEditScreen.automaticStateChange = self;
                 stateMachine.control(event, false);
             }
         }
     },
     scaleEditScreen: {
+        automaticStateChange: false,
         func: (event) => {
             const self = states.scaleEditScreen;
             if(event.type == "keydown") {
@@ -52,34 +66,52 @@ const states = {
                     if(editScreenConfig.scale < 0.2) editScreenConfig.scale = 0.2;
                 }
             }
-            //Altera para o estado de mover a tela de edição
-            else if(event.type == "mousedown" || event.type == "touchstart") {
-                stateMachine.currentState = states.moveEditScreen;
+            // Altera para o estado anterior a este / o estado que chamou este
+            else if((event.type == "mousedown" || event.type == "touchstart") && self.automaticStateChange) {
+                stateMachine.currentState = self.automaticStateChange;
+                self.automaticStateChange = false;
                 stateMachine.control(event);
             }
         }
     },
     drawWithPencil: {
         on: false,
+        old: {x: null, y: null},
         func: (event) => {
             const self = states.drawWithPencil;
-
+            
             const draw = (auxiliary) => {
                 const img_data = auxiliary ? auxiliaryImageData : currentImageData;
                 const coords = canvasClientCoordsInImageDataCoords(event);
-                const inside = ImgData.setPixel(img_data, editScreenConfig.colorMain, coords.x, coords.y);
-                if(!auxiliary) cache.imageBitmap.modified = true;
+                const inside = coords.x >= 0 && coords.y >= 0 && coords.x <= img_data.width && img_data.height; 
+                if(!(coords.x == self.old.x && coords.y == self.old.y)) {
+                    ImgData.setPixel(img_data, editScreenConfig.colorMain, coords.x, coords.y);
+                    self.old = {x: coords.x, y: coords.y};
+                    if(!auxiliary) cache.imageBitmap.modified = true;
+                }
                 return inside;
             }
-
+            
+            //Altera para o estado de mudar escala da tela de edição
+            if(event.type == "keydown") {
+                stateMachine.currentState = states.scaleEditScreen;
+                states.scaleEditScreen.automaticStateChange = self;
+                stateMachine.control(event, false);
+                return
+            }
             //Desenha diretamente em currentImageData caso o canal alpha do lapis seja 255
-            if(editScreenConfig.colorMain[3] == 255) {
+            else if(editScreenConfig.colorMain[3] == 255) {
                 if(event.type == "mousedown" || event.type == "touchstart") {
                     self.on = true;
+                    colorSelectorTab.visible = true;
+                    colorSelectorTab.toogle();
+                    
                     if(!draw()) {
                         self.on = false;
                         stateMachine.currentState = states.moveEditScreen;
-                        stateMachine.control(event);
+                        states.moveEditScreen.returnToPreviousState = self;
+                        stateMachine.control(event); // Passa o controle da máquina de estado para outro(a) função/estado
+                        return //Faz com que a execução desta função termine aqui
                     }
                 }
                 else if((event.type == "mousemove" || event.type == "touchmove") && self.on) {
@@ -87,17 +119,22 @@ const states = {
                 }
                 else if(event.type == "mouseup" || event.type == "touchend") {
                     self.on = false;
+                    self.old = {x: null, y: null};
                 }
             }
             else {// senão desenhe em auxiliaryImageData e depois mescle 
                 if(event.type == "mousedown" || event.type == "touchstart") {
                     self.on = true;
                     imageConfig.auxiliaryImage = true;
-
+                    colorSelectorTab.visible = true;
+                    colorSelectorTab.toogle();
+                    
                     if(!draw(true)) {
                         self.on = false;
                         stateMachine.currentState = states.moveEditScreen;
-                        stateMachine.control(event);
+                        states.moveEditScreen.returnToPreviousState = self;
+                        stateMachine.control(event); // Passa o controle da máquina de estado para outro(a) função/estado
+                        return //Faz com que a execução desta função termine aqui
                     }
                 }
                 else if((event.type == "mousemove" || event.type == "touchmove") && self.on) {
@@ -105,6 +142,7 @@ const states = {
                 }
                 else if(event.type == "mouseup" || event.type == "touchend") {
                     self.on = false;
+                    self.old = {x: null, y: null};
                     imageConfig.auxiliaryImage = false;
                     mergeImages();
                 }
@@ -114,14 +152,13 @@ const states = {
 }
 
 const stateMachine = {
-    currentState: null,
+    currentState: states.moveEditScreen,
     control: (event, preventDefault = true) => {
         if(preventDefault) { event.preventDefault() }
         const state = stateMachine.currentState ?? null;
-        if(state) {
+        if(state && currentImageData) {
             state.func(event);
         }
-        console.log(event.type);
     }
 }
 
@@ -152,10 +189,23 @@ editScreenToolbarElem.addEventListener("touchstart", (e) => e.stopPropagation(),
 editScreenToolbarElem.addEventListener("touchmove", (e) => e.stopPropagation(), {passive: false});
 editScreenToolbarElem.addEventListener("touchend", (e) => e.stopPropagation(), {passive: false});
 
+//Parar a propagação no colorSelectorTabElem
+const colorSelectorTabElem = document.getElementById("colorSelectorTab");
+colorSelectorTabElem.addEventListener("mousedown", (e) => e.stopPropagation(), false);
+colorSelectorTabElem.addEventListener("mousemove", (e) => e.stopPropagation(), false);
+colorSelectorTabElem.addEventListener("mouseup", (e) => e.stopPropagation(), false);
+colorSelectorTabElem.addEventListener("mouseout", (e) => e.stopPropagation(), false);
+
+editScreenToolbarElem.addEventListener("touchstart", (e) => e.stopPropagation(), {passive: false});
+editScreenToolbarElem.addEventListener("touchmove", (e) => e.stopPropagation(), {passive: false});
+editScreenToolbarElem.addEventListener("touchend", (e) => e.stopPropagation(), {passive: false});
+
 //Botões do elemento edit-screen-toolbar
 const moveEditScreenBtn = document.getElementById("moveEditScreenBtn");
 const pencilBtn = document.getElementById("pencilBtn");
+const colorPaletteBtn = document.getElementById("colorPaletteBtn");
 
 //Adicionando comportamentos nos botões
 moveEditScreenBtn.addEventListener("click", () => stateMachine.currentState = states.moveEditScreen, false);
 pencilBtn.addEventListener("click", () => stateMachine.currentState = states.drawWithPencil, false);
+colorPaletteBtn.addEventListener("click", colorSelectorTab.toogle, false);

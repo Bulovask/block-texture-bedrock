@@ -12,7 +12,7 @@ const editScreenConfig = {
     border: true,
     borderColor: "#000",
     borderWeight: 1,
-    colorMain: [0, 0, 0, 128],
+    colorMain: [0, 0, 255, 128],
     colorSecondary: [255, 255, 255, 255]
 }
 
@@ -85,24 +85,24 @@ function mergeImages() {
 
 function mainLoop() {
     transformEditScreen(); //Função que se encontra em js/transformEditScreen.js
-    if(cache.imageBitmap.modified) {
-        createImageBitmap(currentImageData).then(img => {
-            renderImageInEditScreen(img);
-            cache.imageBitmap.image = img;
-            cache.imageBitmap.modified = false;
-        });
-        requestAnimationFrame(mainLoop);
-    }
-    else {
-        if(imageConfig.auxiliaryImage) {
-            createImageBitmap(auxiliaryImageData).then(auxImg => {
-                renderImageInEditScreen(cache.imageBitmap.image, auxImg);
+    if(currentImageData) { // Verifica se a currentImageData foi criada pela função createImageData()
+        if(cache.imageBitmap.modified) {
+            createImageBitmap(currentImageData).then(img => {
+                renderImageInEditScreen(img);
+                cache.imageBitmap.image = img;
+                cache.imageBitmap.modified = false;
             });
         }
         else {
-            renderImageInEditScreen(cache.imageBitmap.image);
+            if(imageConfig.auxiliaryImage) {
+                createImageBitmap(auxiliaryImageData).then(auxImg => {
+                    renderImageInEditScreen(cache.imageBitmap.image, auxImg);
+                });
+            }
+            else {
+                renderImageInEditScreen(cache.imageBitmap.image);
+            }
         }
-        requestAnimationFrame(mainLoop);
-
     }
+    requestAnimationFrame(mainLoop);
 }

@@ -43,6 +43,57 @@ menu#edit-screen-toolbar {
     height: calc(100vh - 30px);
 }
 
+section#colorSelectorTab {
+    box-sizing: border-box;
+    position: fixed;
+    background-color: #000d5898;
+    box-shadow: 1px 1px 4px #000;
+    border-radius: 10px;
+    width: 25vw;
+    height: 80vh;
+    top: 15px;
+    left: calc(6vw + 10px + 4px);
+    padding: 5px;
+}
+
+#colorSelectorTab.hidden {
+    display: none;
+}
+
+#colorSelectorWidget {
+    position: relative;
+    display: flex;
+    gap: 4px;
+    flex-direction: column;
+    box-sizing: border-box;
+    border: 1px solid #000;
+}
+
+
+#colorSelectorWidget > canvas#colorSelectorCanvas {
+    background-color: transparent;
+    background-image: url("images/default-transparent-bg.png");
+    width: 100%;
+    height: auto;
+    margin-bottom: 0;
+}
+
+#auxiliaryChannelSelector, #alphaChannelSelector {
+    position: relative;
+    background-color: #fff;
+    width: 100%;
+    height: 20px;
+}
+
+:is(#auxiliaryChannelSelector, #alphaChannelSelector) .cursor {
+    --percent: 10%;
+    position: absolute;
+    width: 2px;
+    height: 100%;
+    background-color: #000;
+    left: var(--percent);
+}
+
 @media (orientation: portrait) {
     menu#edit-screen-toolbar {
         --width-or-height-edit-screen-toolbar: 6vh;
@@ -52,6 +103,36 @@ menu#edit-screen-toolbar {
         bottom: 10px;
         left: 15px;
         width: calc(100vw - 30px);
+    }
+
+    section#colorSelectorTab {
+        width: calc(100vw - 30px);
+        height: 25vh;
+        top: auto;
+        bottom: calc(6vh + 15px + 4px);
+        left: 15px;
+    }
+    
+    #colorSelectorWidget {
+        flex-direction: row;
+    }
+
+    #colorSelectorWidget > canvas#colorSelectorCanvas {
+        height: calc(25vh - 10px);
+        width: auto;
+    }
+
+    #auxiliaryChannelSelector, #alphaChannelSelector {
+        width: 20px;
+        height: calc(25vh - 10px);
+        margin-right: 4px;
+    }
+
+    :is(#auxiliaryChannelSelector, #alphaChannelSelector) .cursor {
+        width: 100%;
+        height: 2px;
+        left: 0;
+        bottom: var(--percent);
     }
 }
 

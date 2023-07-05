@@ -36,6 +36,8 @@ class ImgData {
     static drawPixel(imgData, color, x, y) {
         const pixel = ImgData.getPixel(imgData, x, y);
         if(pixel) {
+            if(color[3] == 0) return true;
+            
             const normalizedPixel = [pixel[0], pixel[1], pixel[2], pixel[3] / 255];
             const normalizedColor = [color[0], color[1], color[2], color[3] / 255];
             if(normalizedColor[3] < 0.007) normalizedColor[3] = 0;
