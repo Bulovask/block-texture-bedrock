@@ -126,3 +126,44 @@ const colorSelectorTab = {
         colorSelectorTab.visible = !colorSelectorTab.visible;
     }
 }
+
+const creationTab = {
+    visible: false,
+    init: () => {
+        const createBtn = document.getElementById("create-image-btn");
+        const cancelBtn = document.getElementById("cancel-image-creation-btn");
+
+        createBtn.addEventListener("click", () => {
+            const width = parseInt(document.getElementById("width-image-input").value);
+            const height = parseInt(document.getElementById("height-image-input").value);
+            const color = document.getElementById("background-image-input").value;
+
+            imageConfig.width = width;
+            imageConfig.height = height;
+            imageConfig.background = color.split(",").map(n => parseInt(n));
+
+            createImageData(imageConfig.width, imageConfig.height, imageConfig.background);
+            mainCanvas.classList.remove("hidden");
+            creationTab.toogle();
+            transformMainCanvas();
+            mainLoop();
+        }, false);
+
+        cancelBtn.addEventListener("click", creationTab.toogle, false);
+    },
+    toogle: () => {
+        const creationTabElem = document.getElementById("creationTab");
+        creationTabElem.classList.toggle("hidden", !creationTab.visible);
+        
+        if(creationTab.visible) {
+            stateMachine.currentState = null; //Desativa os estados
+        }
+        else {
+            stateMachine.currentState = states.moveEditScreen; //Habilita o estado de movimentação
+        }
+
+        creationTab.visible = !creationTab.visible;
+    }
+}
+
+creationTab.init();

@@ -1,6 +1,7 @@
 body {
     margin: 0;
     padding: 0;
+    background-color: #290057;
 }
 
 main {
@@ -12,7 +13,8 @@ main {
     height: calc(100vh - 10px);
 }
 
-canvas#edit-screen {
+#edit-screen {
+    position: relative;
     box-sizing: border-box;
     background-image: url("images/default-transparent-bg.png");
     background-repeat: repeat-x repeat-y;
@@ -21,9 +23,20 @@ canvas#edit-screen {
     image-rendering: pixelated;
     width: 100%;
     height: 100%;
+    overflow: hidden;
 }
 
-menu#edit-screen-toolbar {
+#main-canvas {
+    box-sizing: border-box;
+    position: absolute;
+    border: 1px solid black;
+}
+
+#main-canvas.hidden {
+    display: none;
+}
+
+#edit-screen-toolbar {
     --width-or-height-edit-screen-toolbar: 6vw;
     box-sizing: border-box;
     margin: 0;
@@ -43,7 +56,7 @@ menu#edit-screen-toolbar {
     height: calc(100vh - 30px);
 }
 
-section#colorSelectorTab {
+#colorSelectorTab {
     box-sizing: border-box;
     position: fixed;
     background-color: #000d5898;
@@ -95,7 +108,7 @@ section#colorSelectorTab {
 }
 
 @media (orientation: portrait) {
-    menu#edit-screen-toolbar {
+    #edit-screen-toolbar {
         --width-or-height-edit-screen-toolbar: 6vh;
         flex-direction: row;
         height: var(--width-or-height-edit-screen-toolbar);
@@ -105,7 +118,7 @@ section#colorSelectorTab {
         width: calc(100vw - 30px);
     }
 
-    section#colorSelectorTab {
+    #colorSelectorTab {
         width: calc(100vw - 30px);
         height: 25vh;
         top: auto;
@@ -117,7 +130,7 @@ section#colorSelectorTab {
         flex-direction: row;
     }
 
-    #colorSelectorWidget > canvas#colorSelectorCanvas {
+    #colorSelectorWidget > #colorSelectorCanvas {
         height: calc(25vh - 10px);
         width: auto;
     }
@@ -136,7 +149,7 @@ section#colorSelectorTab {
     }
 }
 
-menu#edit-screen-toolbar button{
+#edit-screen-toolbar button{
     margin: 0;
     padding: 0;
     border: 1px solid #000;
@@ -150,9 +163,54 @@ menu#edit-screen-toolbar button{
     flex-shrink: 0;
 }
 
-menu#edit-screen-toolbar button:active {
+#edit-screen-toolbar button:active {
     background-color: #4b4b4b;
     border-bottom-width: 1px;
     margin-top: 3px;
     height: calc(var(--width-or-height-edit-screen-toolbar) - 4px - 3px);
+}
+
+
+#creationTab {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: fixed;
+    width: 100vw;
+    height: 100vh;
+    left: 0;
+    top: 0;
+
+    background-color: #0000007a;
+}
+
+#creationTab.hidden {
+    display: none;
+}
+
+#creationTab .menu {
+    box-sizing: border-box;
+    position: relative;
+    width: max-content;
+    height: max-content;
+
+    background-color: #000d58cc;
+    box-shadow: 1px 1px 4px #000;
+    border-radius: 10px;
+    padding: 10px;
+    color: #eee;
+    text-shadow: 1px 1px 3px #000000, -1px -1px 3px #000000;
+}
+
+#creationTab .menu div {
+    display: flex;
+    justify-content: space-between;
+    padding: 2px;
+    gap: 5px;
+}
+
+#creationTab .menu div > * {
+    box-sizing: border-box;
+    width: 10vw;
+    padding: 5px;
 }

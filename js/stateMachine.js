@@ -9,9 +9,9 @@ const states = {
             const self = states.moveEditScreen;
 
             if((event.type == "mousedown" && event.buttons == 1) || (event.type == "touchstart" && event.targetTouches.length == 1)) {
-                const {x, y} = canvasClientCoordsInImageDataCoords(event);
+                const {x, y} = editScreenClientCoordsIntoImageDataCoords(event);
                 
-                if(self.returnToPreviousState && x >= 0 && y >= 0 && x <= currentImageData.width && y <= currentImageData.height) {
+                if(self.returnToPreviousState && x >= 0 && y >= 0 && x < currentImageData.width && y < currentImageData.height) {
                     stateMachine.currentState = self.returnToPreviousState;
                     self.returnToPreviousState = false;
                     stateMachine.control(event);
@@ -24,28 +24,31 @@ const states = {
                 }
                 
             }
-
+            
             else if((event.type == "mousemove" && self.mainMouseButtonPressed) || (event.type == "touchmove" && event.targetTouches.length == 1 && self.mainMouseButtonPressed)) {
                 const x = event.clientX ?? event.targetTouches[0].clientX;
                 const y = event.clientY ?? event.targetTouches[0].clientY;
-
-                const coords = canvasClientCoordsToCanvasCoords(x, y);
-                const oldCoords = canvasClientCoordsToCanvasCoords(self.oldX, self.oldY);
                 
-                editScreenConfig.x += (coords.x - oldCoords.x) / editScreenConfig.scale;
-                editScreenConfig.y += (coords.y - oldCoords.y) / editScreenConfig.scale;
+                const coords = {x, y};
+                const oldCoords = {x: self.oldX, y: self.oldY};
+                
+                editScreenConfig.x += (coords.x - oldCoords.x);
+                editScreenConfig.y += (coords.y - oldCoords.y);
                 
                 self.oldX = x;
                 self.oldY = y;
-            }
 
-            else if((event.type == "mouseup" && event.buttons == 0) || (event.type == "mouseout") || (event.type == "touchend" && event.targetTouches.length == 1) || (event.type == "touchstart" && event.targetTouches.length > 1)) {
+                transformMainCanvas();
+            }
+            
+            else if((event.type == "mouseup" && event.buttons == 0) || (event.type == "mouseout" && (!(event.target === mainCanvas || event.target === editScreenElem)) || event.relatedTarget === editScreenToolbarElem) || 
+                    (event.type == "touchend" && event.targetTouches.length == 1) || (event.type == "touchstart" && event.targetTouches.length > 1)) {
                 self.oldX = null;
                 self.oldY = null;
                 self.mainMouseButtonPressed = false;
             }
             //Altera para o estado de mudar escala da tela de edição
-            else if(event.type == "keydown") {
+            else if((event.type == "keydown" && ({"-":1,"+":1})[event.key]) || event.type == "wheel" || (event.type == "touchstart" && event.targetTouches.length == 2)) {
                 stateMachine.currentState = states.scaleEditScreen;
                 states.scaleEditScreen.automaticStateChange = self;
                 stateMachine.control(event, false);
@@ -56,14 +59,16 @@ const states = {
         automaticStateChange: false,
         func: (event) => {
             const self = states.scaleEditScreen;
-            if(event.type == "keydown") {
-                if(event.key == "+") {
-                    editScreenConfig.scale += 0.02;
-                    if(editScreenConfig.scale > 5) editScreenConfig.scale = 5;
+            if(event.type == "keydown" || event.type == "wheel") {
+                if(event.key == "+" || event.deltaY < 0) {
+                    editScreenConfig.scale += 0.008;
+                    if(editScreenConfig.scale > 10) editScreenConfig.scale = 10;
+                    transformMainCanvas();
                 }
-                else if(event.key == "-") {
-                    editScreenConfig.scale -= 0.02;
+                else if(event.key == "-" || event.deltaY > 0) {
+                    editScreenConfig.scale -= 0.008;
                     if(editScreenConfig.scale < 0.2) editScreenConfig.scale = 0.2;
+                    transformMainCanvas();
                 }
             }
             // Altera para o estado anterior a este / o estado que chamou este
@@ -82,8 +87,8 @@ const states = {
             
             const draw = (auxiliary) => {
                 const img_data = auxiliary ? auxiliaryImageData : currentImageData;
-                const coords = canvasClientCoordsInImageDataCoords(event);
-                const inside = coords.x >= 0 && coords.y >= 0 && coords.x <= img_data.width && img_data.height; 
+                const coords = editScreenClientCoordsIntoImageDataCoords(event);
+                const inside = coords.x >= 0 && coords.y >= 0 && coords.x < img_data.width && coords.y < img_data.height; 
                 if(!(coords.x == self.old.x && coords.y == self.old.y)) {
                     ImgData.setPixel(img_data, editScreenConfig.colorMain, coords.x, coords.y);
                     self.old = {x: coords.x, y: coords.y};
@@ -93,7 +98,7 @@ const states = {
             }
             
             //Altera para o estado de mudar escala da tela de edição
-            if(event.type == "keydown") {
+            if((event.type == "keydown" && ({"-":1,"+":1})[event.key]) || event.type == "wheel" || (event.type == "touchstart" && event.targetTouches.length == 2)) {
                 stateMachine.currentState = states.scaleEditScreen;
                 states.scaleEditScreen.automaticStateChange = self;
                 stateMachine.control(event, false);
@@ -101,7 +106,7 @@ const states = {
             }
             //Desenha diretamente em currentImageData caso o canal alpha do lapis seja 255
             else if(editScreenConfig.colorMain[3] == 255) {
-                if(event.type == "mousedown" || event.type == "touchstart") {
+                if((event.type == "mousedown" && event.buttons == 1) || event.type == "touchstart") {
                     self.on = true;
                     colorSelectorTab.visible = true;
                     colorSelectorTab.toogle();
@@ -123,7 +128,7 @@ const states = {
                 }
             }
             else {// senão desenhe em auxiliaryImageData e depois mescle 
-                if(event.type == "mousedown" || event.type == "touchstart") {
+                if((event.type == "mousedown" && event.buttons == 1) || event.type == "touchstart") {
                     self.on = true;
                     imageConfig.auxiliaryImage = true;
                     colorSelectorTab.visible = true;
@@ -163,15 +168,18 @@ const stateMachine = {
 }
 
 //Eventos do mouse
-window.addEventListener("mouseout", stateMachine.control, false);
-window.addEventListener("mousedown", stateMachine.control, false);
-window.addEventListener("mouseup", stateMachine.control, false);
-window.addEventListener("mousemove", stateMachine.control, false);
+window.addEventListener("mouseout", (event) => stateMachine.control(event, false), false);
+window.addEventListener("mousedown", (event) => stateMachine.control(event, false), false);
+window.addEventListener("mouseup", (event) => stateMachine.control(event, false), false);
+window.addEventListener("mousemove", (event) => stateMachine.control(event, false), false);
+
+//Eventos da roda do mouse
+window.addEventListener("wheel", (event) => {stateMachine.control(event, false)}, false);
 
 //Eventos do touchScreen
-window.addEventListener("touchstart", stateMachine.control, {passive: false});
-window.addEventListener("touchmove", stateMachine.control, {passive: false});
-window.addEventListener("touchend", stateMachine.control, {passive: false});
+window.addEventListener("touchstart", (event) => {stateMachine.control(event, false)}, {passive: false});
+window.addEventListener("touchmove", (event) => {stateMachine.control(event, true)}, {passive: false});
+window.addEventListener("touchend", (event) => {stateMachine.control(event, false)}, {passive: false});
 
 //Eventos de teclado
 window.addEventListener("keydown", (event) => { stateMachine.control(event, false) }, false);
@@ -182,7 +190,7 @@ window.addEventListener("keyup", (event) => { stateMachine.control(event, false)
 const editScreenToolbarElem = document.getElementById("edit-screen-toolbar");
 editScreenToolbarElem.addEventListener("mousedown", (e) => e.stopPropagation(), false);
 editScreenToolbarElem.addEventListener("mousemove", (e) => e.stopPropagation(), false);
-editScreenToolbarElem.addEventListener("mouseup", (e) => e.stopPropagation(), false);
+//editScreenToolbarElem.addEventListener("mouseup", (e) => e.stopPropagation(), false);
 editScreenToolbarElem.addEventListener("mouseout", (e) => e.stopPropagation(), false);
 
 editScreenToolbarElem.addEventListener("touchstart", (e) => e.stopPropagation(), {passive: false});
@@ -206,6 +214,9 @@ const pencilBtn = document.getElementById("pencilBtn");
 const colorPaletteBtn = document.getElementById("colorPaletteBtn");
 
 //Adicionando comportamentos nos botões
-moveEditScreenBtn.addEventListener("click", () => stateMachine.currentState = states.moveEditScreen, false);
+moveEditScreenBtn.addEventListener("click", () => {
+    stateMachine.currentState = states.moveEditScreen;
+    states.moveEditScreen.returnToPreviousState = false;
+}, false);
 pencilBtn.addEventListener("click", () => stateMachine.currentState = states.drawWithPencil, false);
 colorPaletteBtn.addEventListener("click", colorSelectorTab.toogle, false);

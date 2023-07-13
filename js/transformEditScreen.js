@@ -1,70 +1,55 @@
-function transformEditScreen() {
-    //Aplica as transformações no contexto do screenEditor e limpa a tela
-    editScreenCtx.imageSmoothingEnabled = false;
+function transformMainCanvas() {
+    //Aplica as transformações no contexto do screenEditor
+    //mainCanvasCtx.imageSmoothingEnabled = false;
     
+    const ESCWidth = editScreenElem.clientWidth;
+    const ESCHeight = editScreenElem.clientHeight;
+    const ESAspectRatio = ESCWidth / ESCHeight;
+    const MCWidth = mainCanvas.width;
+    const MCHeight = mainCanvas.height;
+    const MCAspectRatio = MCWidth / MCHeight;
     const scale = editScreenConfig.scale;
-    const x = editScreenConfig.x;
-    const y = editScreenConfig.y;
+    const padding = 10;
 
-    editScreenCtx.resetTransform();
-    editScreenCtx.translate(editScreenElem.width / 2, editScreenElem.height / 2);
-    editScreenCtx.scale(scale, scale);
-    editScreenCtx.translate(x, y);
-
-    //Limpa a tela
-    editScreenCtx.clearRect(
-        -x - editScreenElem.width  / 2 / scale,
-        -y - editScreenElem.height / 2 / scale,
-        editScreenElem.width  / scale,
-        editScreenElem.height / scale
-    );
-}
-
-function resizeEditScreen() {
-    if(imageConfig.height * editScreenElem.clientWidth < imageConfig.width * editScreenElem.clientHeight) { 
-        editScreenElem.width = imageConfig.width * 1.25 * editScreenConfig.pixelSize;
-        editScreenElem.height = Math.trunc(editScreenConfig.pixelSize * 1.25 * imageConfig.width / editScreenElem.clientWidth * editScreenElem.clientHeight);
+    let width;
+    let height;
+    
+    if(ESAspectRatio <= MCAspectRatio) {
+        width = (ESCWidth - padding) * scale;
+        height = (width * MCHeight / MCWidth);
     }
     else {
-        editScreenElem.height = imageConfig.height * 1.25 * editScreenConfig.pixelSize;
-        editScreenElem.width = Math.trunc(editScreenConfig.pixelSize * 1.25 * imageConfig.height / editScreenElem.clientHeight * editScreenElem.clientWidth);
+        height = (ESCHeight - padding) * scale;
+        width = (height * MCWidth / MCHeight);
     }
+
+    mainCanvas.style.width = width + "px";
+    mainCanvas.style.height = height + "px";
+    
+    let x = editScreenConfig.x + (ESCWidth - mainCanvas.clientWidth) / 2 - 1;
+    let y = editScreenConfig.y + (ESCHeight - mainCanvas.clientHeight) / 2 - 1;
+
+    mainCanvas.style.left = x + "px";
+    mainCanvas.style.top = y + "px";
 }
 
-function canvasClientCoordsToCanvasCoords(x, y) {
-    return {
-        x: x * editScreenElem.width / editScreenElem.clientWidth,
-        y: y * editScreenElem.height / editScreenElem.clientHeight
-    }
+function editScreenClientCoordsIntoImageDataCoords(event) {
+    const ese = editScreenElem;
+    const mc = mainCanvas;
+    
+    const mcpos = mc.getBoundingClientRect();
+    
+    const ex = event.clientX ?? event.targetTouches[0].clientX;
+    const ey = event.clientY ?? event.targetTouches[0].clientY;
+
+    const x = Math.floor((ex - mcpos.x) * mc.width / mc.clientWidth);
+    const y = Math.floor((ey - mcpos.y) * mc.height / mc.clientHeight);
+
+    return {x, y}
+    
 }
-
-function canvasClientCoordsInImageDataCoords(event) {
-    const width = currentImageData.width;
-    const height = currentImageData.height;
-    const pixelSize = editScreenConfig.pixelSize;
-    const scale = editScreenConfig.scale;
-    const esc = editScreenConfig;
-
-
-    const x = event.clientX ?? event.targetTouches[0].clientX;
-    const y = event.clientY ?? event.targetTouches[0].clientY;
-    const coords = canvasClientCoordsToCanvasCoords(x, y);
-
-    return {
-        x: Math.floor((-esc.x + coords.x / scale - editScreenElem.width / scale / 2 + pixelSize * width / 2) / pixelSize),
-        y: Math.floor((-esc.y + coords.y / scale - editScreenElem.height / scale / 2 + pixelSize * height / 2) / pixelSize)
-    }
-}
-
-//Essa função é apenas para testes, não permanecerá aqui e nem será assim
-// function draw(event) {
-//     const coords = canvasClientCoordsInImageDataCoords(event);
-//     ImgData.drawPixel(currentImageData, imageConfig.background, coords.x, coords.y);
-//     cache.imageBitmap.modified = true;
-// }
 
 //Adicionando eventos
-window.addEventListener("resize", resizeEditScreen, false);
-
-window.addEventListener("click", (event) => {event.preventDefault()}, false);
+window.addEventListener("resize", transformMainCanvas, false);
+//window.addEventListener("click", (event) => {event.preventDefault()}, false);
 window.addEventListener("contextmenu", event => event.preventDefault(), false);

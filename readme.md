@@ -7,3 +7,4 @@ Para visualizar, [clique aqui](https://bulovask.github.io/block-texture-bedrock/
 ## Atualizações
 
 * 20/01/2023 - Adicionado funcões que trata da conversão de coordenadas de clique em coordenadas da imagem.
+* 13/07/2023 - Refatoração de código, a forma que o edit-screen era renderizado foi refeita, permitindo um maior desempenho ao editar imagens maiores; melhorias nos estados do programa.

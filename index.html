@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="pt">
+<html lang="pt-br">
 <head>
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
@@ -11,12 +11,14 @@
 </head>
 <body>
     <main>
-        <canvas id="edit-screen"></canvas>
+        <section id="edit-screen">
+            <canvas id="main-canvas" class="hidden"></canvas>
+        </section>
     </main>
     <menu id="edit-screen-toolbar" type="toolbar">
         <button id="moveEditScreenBtn"></button>
         <button id="pencilBtn"></button>
-        <button id="colorPaletteBtn"></button>
+        <button id="colorPaletteBtn" style="display: none;"></button>
     </menu>
     
     <section id="colorSelectorTab" class="hidden">
@@ -25,6 +27,28 @@
             <canvas id="auxiliaryChannelSelector"></canvas>
             <canvas id="alphaChannelSelector"></canvas>
         </div>
+    </section>
+
+    <section id="creationTab">
+        <form class="menu">
+            <h2>Nova imagem</h2>
+            <div>
+                <label>Largura</label>
+                <input id="width-image-input" type="number" min="1" value="16">   
+            </div>
+            <div>  
+                <label>Altura</label>
+                <input id="height-image-input" type="number" min="1" value="16">
+            </div>
+            <div>  
+                <label>Cor de fundo</label>
+                <input id="background-image-input" type="text" placeholder="255, 0, 0, 255" value="255,255,255,255">
+            </div>
+            <div>
+                <input id="create-image-btn" type="button" value="Criar" >
+                <input id="cancel-image-creation-btn" type="button" value="Cancelar"  disabled>
+            </div>
+        </form>
     </section>
 
     <script src="js/imgData_tools.js"></script>
