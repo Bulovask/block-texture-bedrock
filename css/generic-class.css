@@ -1,0 +1,12 @@
+.hidden {display: none !important}
+
+.default-container-style {
+    box-sizing: border-box;
+    background-color: var(--color-2-translucent);
+    box-shadow: 1px 1px 4px var(--color-text-dark);
+    border-radius: 10px;
+    color: var(--color-text-light);
+    text-shadow: 1px 1px 3px var(--color-text-dark), -1px -1px 3px var(--color-text-dark);
+    padding: 10px;
+
+}

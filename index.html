@@ -8,6 +8,7 @@
 
     <link rel="stylesheet" href="css/style.css">
     <link rel="stylesheet" href="css/icons.css">
+    <link rel="stylesheet" href="css/generic-class.css">
 </head>
 <body>
     <main>
@@ -15,13 +16,38 @@
             <canvas id="main-canvas" class="hidden"></canvas>
         </section>
     </main>
-    <menu id="edit-screen-toolbar" type="toolbar">
+
+    <menu id="config-toolbar" type="toolbar" class="default-container-style hidden">
+        <section id="file-tab" class="tab">
+            <span class="button-tab-toolbar">Arquivo</span>
+            <div class="content default-container-style">
+                <input id="new-image-btn" type="button" value="Nova imagem">
+                <input type="button" value="Importar imagem">
+                <input type="button" value="Exportar imagem">
+            </div>
+        </section>
+        <section id="file-tab" class="tab">
+            <span class="button-tab-toolbar">Filtros</span>
+            <div class="content default-container-style">
+                <input type="button" value="Não Implementado">
+                <input type="button" value="Não Implementado">
+                <input type="button" value="Não Implementado">
+                <input type="button" value="Não Implementado">
+                <input type="button" value="Não Implementado">
+                <input type="button" value="Não Implementado">
+            </div>
+        </section>
+    </menu>
+    
+    <input id="open-config-btn" type="button" value="">
+
+    <menu id="edit-screen-toolbar" type="toolbar" class="default-container-style">
         <button id="moveEditScreenBtn"></button>
         <button id="pencilBtn"></button>
         <button id="colorPaletteBtn" style="display: none;"></button>
     </menu>
     
-    <section id="colorSelectorTab" class="hidden">
+    <section id="colorSelectorTab" class="hidden" class="default-container-style">
         <div id="colorSelectorWidget">
             <canvas id="colorSelectorCanvas" width="256" height="256"></canvas>
             <canvas id="auxiliaryChannelSelector"></canvas>
@@ -30,25 +56,25 @@
     </section>
 
     <section id="creationTab">
-        <form class="menu">
+        <div class="menu default-container-style">
             <h2>Nova imagem</h2>
             <div>
-                <label>Largura</label>
+                <label>Lar<wbr>gu<wbr>ra</label>
                 <input id="width-image-input" type="number" min="1" value="16">   
             </div>
-            <div>  
-                <label>Altura</label>
+            <div>
+                <label>Al<wbr>tu<wbr>ra</label>
                 <input id="height-image-input" type="number" min="1" value="16">
             </div>
-            <div>  
-                <label>Cor de fundo</label>
+            <div>
+                <label>Cor de fun<wbr>do</label>
                 <input id="background-image-input" type="text" placeholder="255, 0, 0, 255" value="255,255,255,255">
             </div>
-            <div>
+            <div class="fill-flex">
                 <input id="create-image-btn" type="button" value="Criar" >
                 <input id="cancel-image-creation-btn" type="button" value="Cancelar"  disabled>
             </div>
-        </form>
+        </div>
     </section>
 
     <script src="js/imgData_tools.js"></script>

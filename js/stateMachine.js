@@ -62,12 +62,16 @@ const states = {
             if(event.type == "keydown" || event.type == "wheel") {
                 if(event.key == "+" || event.deltaY < 0) {
                     editScreenConfig.scale += 0.008;
+                    
                     if(editScreenConfig.scale > 10) editScreenConfig.scale = 10;
+                    editScreenElem.style.backgroundSize = editScreenConfig.scale * 5 + '% auto';
                     transformMainCanvas();
                 }
                 else if(event.key == "-" || event.deltaY > 0) {
                     editScreenConfig.scale -= 0.008;
+                    
                     if(editScreenConfig.scale < 0.2) editScreenConfig.scale = 0.2;
+                    editScreenElem.style.backgroundSize = editScreenConfig.scale * 5 + '% auto';
                     transformMainCanvas();
                 }
             }
@@ -81,7 +85,7 @@ const states = {
     },
     drawWithPencil: {
         on: false,
-        old: {x: null, y: null},
+        old: {x: null, y: null}, // Guarda a posição do ultimo píxel que foi pintado
         func: (event) => {
             const self = states.drawWithPencil;
             
@@ -89,19 +93,53 @@ const states = {
                 const img_data = auxiliary ? auxiliaryImageData : currentImageData;
                 const coords = editScreenClientCoordsIntoImageDataCoords(event);
                 const inside = coords.x >= 0 && coords.y >= 0 && coords.x < img_data.width && coords.y < img_data.height; 
+                
                 if(!(coords.x == self.old.x && coords.y == self.old.y)) {
-                    ImgData.setPixel(img_data, editScreenConfig.colorMain, coords.x, coords.y);
-                    self.old = {x: coords.x, y: coords.y};
-                    if(!auxiliary) cache.imageBitmap.modified = true;
+                    if(self.old.x != null && self.old.y != null) {  
+                        const deltax = Math.abs(coords.x - self.old.x);
+                        const deltay = Math.abs(coords.y - self.old.y);
+                        const deltamax = Math.max(deltax, deltay);
+                        const deltamin = Math.min(deltax, deltay);
+
+                        const signalx = (coords.x - self.old.x < 0) ? -1 : 1;
+                        const signaly = (coords.y - self.old.y < 0) ? -1 : 1;
+                        
+                        for(let i = 0; i < deltamax; i++) {
+                            const vx = deltax != 0 ? signalx * (deltax / deltamax) : 0;
+                            const vy = deltay != 0 ? signaly * (deltay / deltamax) : 0;
+                            
+                            const x = coords.x - Math.round(i * vx);
+                            const y = coords.y - Math.round(i * vy);
+
+                            ImgData.setPixel(img_data, editScreenConfig.colorMain, x, y);
+                        }
+                        
+                        self.old = {x: coords.x, y: coords.y};
+                        if(!auxiliary) cache.imageBitmap.modified = true;
+                    }
+                    else {
+                        ImgData.setPixel(img_data, editScreenConfig.colorMain, coords.x, coords.y);
+                        self.old = {x: coords.x, y: coords.y};
+                        if(!auxiliary) cache.imageBitmap.modified = true;
+                    }
                 }
                 return inside;
             }
             
+            const switchToMoveEditScreen = () => {
+                self.on = false;
+                stateMachine.currentState = states.moveEditScreen;
+                states.moveEditScreen.returnToPreviousState = self;
+                stateMachine.control(event); // Passa o controle da máquina de estado para outro(a) função/estado
+                self.old = {x: null, y: null};
+            } 
+
             //Altera para o estado de mudar escala da tela de edição
             if((event.type == "keydown" && ({"-":1,"+":1})[event.key]) || event.type == "wheel" || (event.type == "touchstart" && event.targetTouches.length == 2)) {
                 stateMachine.currentState = states.scaleEditScreen;
                 states.scaleEditScreen.automaticStateChange = self;
                 stateMachine.control(event, false);
+                self.old = {x: null, y: null};
                 return
             }
             //Desenha diretamente em currentImageData caso o canal alpha do lapis seja 255
@@ -112,10 +150,7 @@ const states = {
                     colorSelectorTab.toogle();
                     
                     if(!draw()) {
-                        self.on = false;
-                        stateMachine.currentState = states.moveEditScreen;
-                        states.moveEditScreen.returnToPreviousState = self;
-                        stateMachine.control(event); // Passa o controle da máquina de estado para outro(a) função/estado
+                        switchToMoveEditScreen();
                         return //Faz com que a execução desta função termine aqui
                     }
                 }
@@ -135,10 +170,7 @@ const states = {
                     colorSelectorTab.toogle();
                     
                     if(!draw(true)) {
-                        self.on = false;
-                        stateMachine.currentState = states.moveEditScreen;
-                        states.moveEditScreen.returnToPreviousState = self;
-                        stateMachine.control(event); // Passa o controle da máquina de estado para outro(a) função/estado
+                        switchToMoveEditScreen();
                         return //Faz com que a execução desta função termine aqui
                     }
                 }

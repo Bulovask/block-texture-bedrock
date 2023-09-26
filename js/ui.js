@@ -1,4 +1,4 @@
-//colorSelectorTab
+// colorSelectorTab
 const colorSelectorTab = {
     visible: false,
     hue: 0,
@@ -127,8 +127,10 @@ const colorSelectorTab = {
     }
 }
 
+// creationTab
 const creationTab = {
     visible: false,
+    cancelBtn: false,
     init: () => {
         const createBtn = document.getElementById("create-image-btn");
         const cancelBtn = document.getElementById("cancel-image-creation-btn");
@@ -153,7 +155,16 @@ const creationTab = {
     },
     toogle: () => {
         const creationTabElem = document.getElementById("creationTab");
+        const cancelImageCreationBtn = document.getElementById("cancel-image-creation-btn");
+
         creationTabElem.classList.toggle("hidden", !creationTab.visible);
+        
+        if(creationTab.cancelBtn) {
+            cancelImageCreationBtn.removeAttribute("disabled");
+        }
+        else {
+            cancelImageCreationBtn.setAttribute("disabled", true);
+        }
         
         if(creationTab.visible) {
             stateMachine.currentState = null; //Desativa os estados
@@ -167,3 +178,38 @@ const creationTab = {
 }
 
 creationTab.init();
+
+//  configToolbar
+const configToolbar = {
+    visible: false,
+    currentState: null,
+    init: () => {
+        creationTab.cancelBtn = true;
+        const openConfigBtn = document.getElementById("open-config-btn");
+        openConfigBtn.addEventListener("click", configToolbar.toogle, false);
+        
+        const newImageBtn = document.getElementById("new-image-btn")
+
+        newImageBtn.addEventListener("click", () => {creationTab.toogle(); configToolbar.toogle()}, false);
+    },
+    toogle: () => {
+        const configToolbarElem = document.getElementById("config-toolbar");
+        const editScreenToolbar = document.getElementById("edit-screen-toolbar");
+        
+        
+        configToolbarElem.classList.toggle("hidden", configToolbar.visible);
+        editScreenToolbar.classList.toggle("hidden", !configToolbar.visible);
+        
+        if(configToolbar.visible) {
+            stateMachine.currentState = configToolbar.currentState; //Ativa o estado anterior
+        }
+        else {
+            configToolbar.currentState = stateMachine.currentState;
+            stateMachine.currentState = null; //Desativa os estados
+        }
+
+        configToolbar.visible = !configToolbar.visible;
+    }
+}
+
+configToolbar.init();

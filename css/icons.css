@@ -1,10 +1,12 @@
-#edit-screen-toolbar button {
+#edit-screen-toolbar button, #open-config-btn {
     background-size: 90% 90%;
     background-position: center;
     background-repeat: no-repeat;
     image-rendering: pixelated;
 }
 
-#moveEditScreenBtn { background-image: url("images/edit-screen-toolbar-icons/move-screen.png"); }
+#moveEditScreenBtn { background-image: url("images/edit-screen-toolbar-icons/move-screen.png");}
 #pencilBtn { background-image: url("images/edit-screen-toolbar-icons/pencil.png");}
 #colorPaletteBtn { background-image: url("images/edit-screen-toolbar-icons/color-palette.png");}
+
+#open-config-btn {background-image: url("images/config-toolbar-icons/config.png");}
