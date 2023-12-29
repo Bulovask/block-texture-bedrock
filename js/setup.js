@@ -8,7 +8,7 @@ let auxiliaryImageData;
 const editScreenConfig = {
     x: 0,
     y: 0,
-    scale: 1,
+    scale: 1000,
     border: true,
     borderColor: "#000",
     borderWeight: 1,
@@ -74,7 +74,6 @@ function mergeImages() {
 }
 
 function mainLoop() {
-    //transformMainCanvas(); //Função que se encontra em js/transformEditScreen.js
     if(currentImageData) { // Verifica se a currentImageData foi criada pela função createImageData()
         if(cache.imageBitmap.modified) {
             createImageBitmap(currentImageData).then(img => {
@@ -89,9 +88,10 @@ function mainLoop() {
                     renderImageInEditScreen(cache.imageBitmap.image, auxImg);
                 });
             }
-            else {
-                //renderImageInEditScreen(cache.imageBitmap.image);
-            }
+            // else { // Necessário caso o MainCanvas seja redimensionado, mas isso é improvável
+                      // Removi para não ficar redesenhando a imagem a todo momento
+            //     renderImageInEditScreen(cache.imageBitmap.image);
+            // }
         }
     }
     requestAnimationFrame(mainLoop);

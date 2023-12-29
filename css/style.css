@@ -42,6 +42,19 @@ main {
     overflow: hidden;
 }
 
+#edit-screen::after {
+    --size: 20px;
+    content: '';
+    position: absolute;
+    width: var(--size);
+    height: var(--size);
+    background-color: #fff;
+    mix-blend-mode: difference;
+    left: calc(50% - var(--size) / 2);
+    top: calc(50% - var(--size) / 2);
+    clip-path: polygon(55% 0, 45% 0, 45% 45%, 0 45%, 0 55%, 45% 55%, 45% 100%, 55% 100%, 55% 55%, 100% 55%, 100% 45%, 55% 45%);
+}
+
 #main-canvas {
     box-sizing: border-box;
     position: absolute;
@@ -142,10 +155,11 @@ main {
 #colorSelectorTab {
     position: fixed;
     width: 25vw;
-    height: 80vh;
+    height: min-content;
     top: 15px;
     left: calc(6vw + 10px + 4px);
     padding: 5px;
+    background-color: red;
 }
 
 #colorSelectorWidget {
@@ -194,15 +208,23 @@ main {
     }
 
     #colorSelectorTab {
-        width: calc(100vw - 30px);
-        height: 25vh;
-        top: auto;
-        bottom: calc(6vh + 15px + 4px);
+        width: min-content;
+        height: min-content;
+        top: initial;
+        bottom: 25vh;
         left: 15px;
     }
     
     #colorSelectorWidget {
         flex-direction: row;
+    }
+
+    #colorSelectorWidget > canvas#colorSelectorCanvas {
+        background-color: transparent;
+        background-image: url("images/default-transparent-bg.png");
+        width: auto;
+        height: 100%;
+        margin-bottom: 0;
     }
 
     #colorSelectorWidget > #colorSelectorCanvas {

@@ -143,6 +143,9 @@ const creationTab = {
             imageConfig.width = width;
             imageConfig.height = height;
             imageConfig.background = color.split(",").map(n => parseInt(n));
+            editScreenConfig.x = 0;
+            editScreenConfig.y = 0;
+            editScreenConfig.scale = 1000;
 
             createImageData(imageConfig.width, imageConfig.height, imageConfig.background);
             mainCanvas.classList.remove("hidden");

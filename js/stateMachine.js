@@ -18,22 +18,22 @@ const states = {
                     return
                 }
                 else {
-                    self.oldX = event.clientX ?? event.targetTouches[0].clientX;
-                    self.oldY = event.clientY ?? event.targetTouches[0].clientY;
+                    self.oldX = event.clientX ?? Math.trunc(event.targetTouches[0].clientX);
+                    self.oldY = event.clientY ?? Math.trunc(event.targetTouches[0].clientY);
                     self.mainMouseButtonPressed = true;
                 }
                 
             }
             
             else if((event.type == "mousemove" && self.mainMouseButtonPressed) || (event.type == "touchmove" && event.targetTouches.length == 1 && self.mainMouseButtonPressed)) {
-                const x = event.clientX ?? event.targetTouches[0].clientX;
-                const y = event.clientY ?? event.targetTouches[0].clientY;
+                const x = event.clientX ?? Math.trunc(event.targetTouches[0].clientX);
+                const y = event.clientY ?? Math.trunc(event.targetTouches[0].clientY);
                 
                 const coords = {x, y};
                 const oldCoords = {x: self.oldX, y: self.oldY};
                 
-                editScreenConfig.x += (coords.x - oldCoords.x);
-                editScreenConfig.y += (coords.y - oldCoords.y);
+                editScreenConfig.x += (coords.x - oldCoords.x) / (editScreenConfig.scale / 1000);
+                editScreenConfig.y += (coords.y - oldCoords.y) / (editScreenConfig.scale / 1000);
                 
                 self.oldX = x;
                 self.oldY = y;
@@ -61,17 +61,23 @@ const states = {
             const self = states.scaleEditScreen;
             if(event.type == "keydown" || event.type == "wheel") {
                 if(event.key == "+" || event.deltaY < 0) {
-                    editScreenConfig.scale += 0.008;
-                    
-                    if(editScreenConfig.scale > 10) editScreenConfig.scale = 10;
-                    editScreenElem.style.backgroundSize = editScreenConfig.scale * 5 + '% auto';
+                    if(editScreenConfig.scale < 10000) {
+                        editScreenConfig.scale *= 1.04;
+                        editScreenConfig.scale = Math.trunc(editScreenConfig.scale);
+                        if(editScreenConfig.scale > 10000) editScreenConfig.scale = 10000;
+                    }
+
+                    editScreenElem.style.backgroundSize = editScreenConfig.scale / 1000 * 5 + '% auto';
                     transformMainCanvas();
                 }
                 else if(event.key == "-" || event.deltaY > 0) {
-                    editScreenConfig.scale -= 0.008;
+                    if(editScreenConfig.scale > 200) {
+                        editScreenConfig.scale /= 1.04;
+                        editScreenConfig.scale = Math.trunc(editScreenConfig.scale);
+                        if(editScreenConfig.scale < 200) editScreenConfig.scale = 200;
+                    }
                     
-                    if(editScreenConfig.scale < 0.2) editScreenConfig.scale = 0.2;
-                    editScreenElem.style.backgroundSize = editScreenConfig.scale * 5 + '% auto';
+                    editScreenElem.style.backgroundSize = editScreenConfig.scale / 1000 * 5 + '% auto';
                     transformMainCanvas();
                 }
             }
