@@ -9,6 +9,7 @@
     <link rel="stylesheet" href="css/style.css">
     <link rel="stylesheet" href="css/icons.css">
     <link rel="stylesheet" href="css/generic-class.css">
+    <link rel="stylesheet" href="css/colorSelectorTab.css">
 </head>
 <body>
     <main>
@@ -44,14 +45,30 @@
     <menu id="edit-screen-toolbar" type="toolbar" class="default-container-style">
         <button id="moveEditScreenBtn"></button>
         <button id="pencilBtn"></button>
-        <button id="colorPaletteBtn" style="display: none;"></button>
+        <button id="colorPaletteBtn"></button>
     </menu>
     
-    <section id="colorSelectorTab" class="hidden" class="default-container-style">
-        <div id="colorSelectorWidget">
-            <canvas id="colorSelectorCanvas" width="256" height="256"></canvas>
-            <canvas id="auxiliaryChannelSelector"></canvas>
-            <canvas id="alphaChannelSelector"></canvas>
+    <section id="colorSelectorTab" class="hidden default-container-style">
+        <div id="RGBASelector">
+            <div class="color"></div>
+            <div class="red channel">
+                <input type="range" min="0" max="255" step="1" value="0">
+                <input type="number" min="0" max="255" step="1" value="0">
+            </div>
+            <div class="green channel">
+                <input type="range" min="0" max="255" step="1" value="0">
+                <input type="number" min="0" max="255" step="1" value="0">
+            </div>
+            <div class="blue channel">
+                <input type="range" min="0" max="255" step="1" value="0">
+                <input type="number" min="0" max="255" step="1" value="0">
+            </div>
+            <div class="alpha channel">
+                <input type="range" min="0" max="255" step="1" value="255">
+                <input type="number" min="0" max="255" step="1" value="255">
+            </div>
+            <input class="ok" type="button" value="OK">
+            <input class="cancel" type="button" value="Cancelar">
         </div>
     </section>
 
@@ -68,7 +85,7 @@
             </div>
             <div>
                 <label>Cor de fun<wbr>do</label>
-                <input id="background-image-input" type="text" placeholder="255, 0, 0, 255" value="255,255,255,255">
+                <input id="background-image-button" type="button">
             </div>
             <div class="fill-flex">
                 <input id="create-image-btn" type="button" value="Criar" >
@@ -77,10 +94,12 @@
         </div>
     </section>
 
-    <script src="js/imgData_tools.js"></script>
+    <script src="js/my_libs/imgData_tools.js"></script>
     <script src="js/setup.js"></script>
     <script src="js/transformEditScreen.js"></script>
-    <script src="js/ui.js"></script>
+    <script src="js/ui/tabs/colorSelectorTab.js"></script>
+    <script src="js/ui/tabs/creationTab.js"></script>
+    <script src="js/ui/configToolbar.js"></script>
     <script src="js/stateMachine.js"></script>
     <script src="js/start.js"></script>
 </body>

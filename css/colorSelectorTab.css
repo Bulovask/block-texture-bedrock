@@ -1,0 +1,61 @@
+#colorSelectorTab {
+    position: fixed;
+    width: max-content;
+    height: min-content;
+    top: 15px;
+    left: calc(6vw + 14px);
+    padding: 5px;
+}
+
+#colorSelectorTab.up {
+    z-index: 9999;
+}
+
+.color {
+    display: block;
+    content: "";
+    border: 1px solid var(--color-2);
+    width: 25px;
+    height: 25px;
+    border-radius: 5px;
+    margin-bottom: 2px;
+}
+
+.channel {
+    display: flex;
+}
+
+.channel > :is(input[type="range"], input[type="number"]) {
+    -webkit-appearance: none;
+    appearance: none;
+    display: inline-block;
+    border: 2px solid var(--color-2);
+    margin: 0;
+    padding: 0;
+}
+
+.channel > input[type="range"]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+
+    background-color: #000000;
+    width: 4px;
+    height: 15px;
+    border: 1px solid #ffffff;
+}
+
+.red > input[type="range"] {
+    background-image: linear-gradient(90deg, #000, #f00);
+}
+
+.green > input[type="range"] {
+    background-image: linear-gradient(90deg, #000, #0f0);
+}
+
+.blue > input[type="range"] {
+    background-image: linear-gradient(90deg, #000, #00f);
+}
+
+.alpha > input[type="range"] {
+    background-color: transparent;
+    background-image: linear-gradient(90deg, #fff0, #ffff);
+}

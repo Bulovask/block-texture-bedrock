@@ -1,6 +1,5 @@
 function transformMainCanvas() {
-    //Aplica as transformações no contexto do screenEditor
-    //mainCanvasCtx.imageSmoothingEnabled = false;
+    //Aplica as transformações no MainCanvas
     
     const ESCWidth = editScreenElem.clientWidth;
     const ESCHeight = editScreenElem.clientHeight;
@@ -49,6 +48,12 @@ function editScreenClientCoordsIntoImageDataCoords(event) {
 
     return {x, y}
     
+}
+
+function resetEditScreen() {
+    editScreenConfig.x = 0;
+    editScreenConfig.y = 0;
+    editScreenConfig.scale = 1000;
 }
 
 //Adicionando eventos

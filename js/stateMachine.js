@@ -242,14 +242,15 @@ colorSelectorTabElem.addEventListener("mousemove", (e) => e.stopPropagation(), f
 colorSelectorTabElem.addEventListener("mouseup", (e) => e.stopPropagation(), false);
 colorSelectorTabElem.addEventListener("mouseout", (e) => e.stopPropagation(), false);
 
-editScreenToolbarElem.addEventListener("touchstart", (e) => e.stopPropagation(), {passive: false});
-editScreenToolbarElem.addEventListener("touchmove", (e) => e.stopPropagation(), {passive: false});
-editScreenToolbarElem.addEventListener("touchend", (e) => e.stopPropagation(), {passive: false});
+colorSelectorTabElem.addEventListener("touchstart", (e) => e.stopPropagation(), {passive: false});
+colorSelectorTabElem.addEventListener("touchmove", (e) => e.stopPropagation(), {passive: false});
+colorSelectorTabElem.addEventListener("touchend", (e) => e.stopPropagation(), {passive: false});
 
 //Botões do elemento edit-screen-toolbar
 const moveEditScreenBtn = document.getElementById("moveEditScreenBtn");
 const pencilBtn = document.getElementById("pencilBtn");
 const colorPaletteBtn = document.getElementById("colorPaletteBtn");
+const backgroundImageButton = document.getElementById("background-image-button");
 
 //Adicionando comportamentos nos botões
 moveEditScreenBtn.addEventListener("click", () => {
@@ -257,4 +258,33 @@ moveEditScreenBtn.addEventListener("click", () => {
     states.moveEditScreen.returnToPreviousState = false;
 }, false);
 pencilBtn.addEventListener("click", () => stateMachine.currentState = states.drawWithPencil, false);
-colorPaletteBtn.addEventListener("click", colorSelectorTab.toogle, false);
+colorPaletteBtn.addEventListener("click", () => {
+    let oldColor = editScreenConfig.colorMain;
+
+    colorSelectorTab.ok_func = (color) => {
+        editScreenConfig.colorMain = color;
+    }
+    colorSelectorTab.update_func = (color) => {
+        oldColor = editScreenConfig.colorMain;
+        editScreenConfig.colorMain = color;
+    }
+    colorSelectorTab.cancel_func = () => {
+        editScreenConfig.colorMain = oldColor;
+    }
+    colorSelectorTab.toogle();
+}, false);
+
+backgroundImageButton.addEventListener("click", () => {
+    let oldColor = imageConfig.background;
+
+    colorSelectorTab.ok_func = (color) => {
+        imageConfig.background = color;
+    }
+    colorSelectorTab.update_func = (color) => {
+        oldColor = imageConfig.background;
+        imageConfig.background = color;
+    }
+    colorSelectorTab.cancel_func = () => {
+        imageConfig.background = oldColor;
+    }
+}, false);
